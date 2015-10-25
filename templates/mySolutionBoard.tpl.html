@@ -1,0 +1,43 @@
+<md-dialog aria-label="Test board popup" ng-controller="MainController" ng-cloak>
+  <form>
+  <md-toolbar>
+    <div class="md-toolbar-tools">
+      <h2>Trying to solve {{nowSolvingIndex}}</h2>
+      <span flex></span>
+      <!-- <md-button class="md-icon-button" ng-click="cancel()">
+        <md-icon md-svg-src="img/icons/ic_close_24px.svg" aria-label="Close dialog"></md-icon>
+      </md-button> -->
+    </div>
+  </md-toolbar>
+  <md-dialog-content style="max-width:800px;">
+    <div class="md-dialog-content">
+      <h2>Test</h2>
+      <p>
+        Test
+      </p>
+      <div id="mySolutionBoard" style="margin: auto; max-width: 100%;"></div>
+      <p>
+        Test
+      </p>
+      <p>
+        Test
+      </p>
+    </div>
+  </md-dialog-content>
+  <div class="md-actions" layout="row">
+    <md-button href="" target="_blank" md-autofocus>
+      Help
+    </md-button>
+    <span flex></span>
+    <md-button ng-click="" >
+     Ok
+    </md-button>
+  </div>
+  </form>
+</md-dialog>
+<script>var cfg = {
+  draggable: true,
+  dropOffBoard: 'snapback', // this is the default
+  position: 'start'
+};
+var board = ChessBoard('mySolutionBoard', cfg);</script>

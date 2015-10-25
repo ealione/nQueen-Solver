@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html ng-app="app">
+
+<head>
+  <!-- chessboard css-->
+  <link type="text/css" rel="stylesheet" href="css/chessboard-0.3.0.min.css">
+
+  <!-- angular material -->
+  <link rel="stylesheet prefetch" href="https://gitcdn.xyz/repo/angular/bower-material/v0.11.4/angular-material.css">
+
+  <!-- fonts -->
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=RobotoDraft:300,400,500,700,400italic">
+
+  <!-- custom style -->
+  <link rel="stylesheet" href="css/style.css">
+
+  <!-- angularjs -->
+  <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.6/angular.js"></script>
+
+</head>
+
+<body ng-cloak>
+  <md-toolbar layout="row" ng-controller="MenuController" class="md-default-theme">
+    <div class="md-toolbar-tools">
+      <h1 class="md-toolbar-tools" layout-align-gt-sm="left">N-Queen Puzzle</h1>
+      <span flex></span>
+      <md-menu md-offset="0-7" ng-cloak>
+        <md-button class="md-icon-button" aria-label="More" ng-click="$mdOpenMenu($event)">
+          <ng-md-icon md-menu-align-target icon="more_vert" style="fill: white" size="52"></ng-md-icon>
+        </md-button>
+        <md-menu-content width="4">
+          <md-menu-item ng-repeat="item in menuItems">
+            <md-button ng-click="announceClick(item.label)">
+              <ng-md-icon md-menu-align-target icon="{{item.icon}}" style="fill: black; padding-top:15px" size="20"></ng-md-icon>
+              <span md-menu-align-target="">{{item.label}}</span>
+            </md-button>
+          </md-menu-item>
+        </md-menu-content>
+      </md-menu>
+    </div>
+  </md-toolbar>
+
+  <div class="" ng-controller="MainController">
+
+    <div class="cp">
+      <div class="card fh" ng-cloak>
+        <!-- form -->
+        <form name="queenForm" ng-submit="queens1(queens)" ng-cloak>
+          <md-input-container>
+            <label>Queens</label>
+            <input required type="number" step="1" name="rate" ng-model="queens" min="1" max="26" ng-change="updateStatistics()" />
+            <div ng-messages="queenForm.rate.$error" multiple>
+              <div ng-message="required">
+                How many queens is NaN exactly?
+              </div>
+              <div ng-message="min">
+                You should choose at least 1 queen.
+              </div>
+              <div ng-message="max">
+                {{queenForm.rate.$viewValue}} queens? Im not saying your browser will crash, but your browser will crash.
+              </div>
+            </div>
+          </md-input-container>
+          <md-switch ng-model="showOperations" class="al" aria-label="show operations switch" ng-true-value="'yes'" ng-false-value="'no'">
+            Show Operations (Slower)
+          </md-switch>
+          <md-button ng-click="submit()" class="md-raised md-primary ar" style="color: white;" ng-disabled="queenForm.$invalid">Solve</md-button>
+        </form>
+
+        <!-- slider -->
+        <div layout>
+          <!-- <div flex="10" layout layout-align="center center">
+            <span class="md-body-1">queens</span>
+          </div> -->
+          <md-slider flex md-discrete ng-model="queens" step="1" min="1" max="26" aria-label="rating"></md-slider>
+        </div>
+      </div>
+
+      <div class="card" ng-cloak>
+        <div class="cp" style="color: #D2D2D2;" ng-cloak>
+          <span class="sdesc">Solving for:</span> [{{queens}}] queens.</br>
+          <span class="sdesc">Possible placements [{{totalPositions}}^{{queens}}]:</span> {{totalPlaces | number}}.</br>
+          <span class="sdesc">Fundamental solutions:</span> {{thisStat.fundamental | number}}.</br>
+          <span class="sdesc">All solutions:</span> {{thisStat.all | number}}.</br>
+          <span class="sdesc">Approximate wait time:</span> {{thisStat.time | fixTime}}.</br>
+          <span ng-if="solutions"><span class="sdesc">Solutions found:</span> {{solutions.length}} <span class="sdesc">in</span> {{runtime}}ms.</span>
+          </br>
+          <span ng-if="totalTests"><span class="sdesc">Total number of tests:</span> {{totalTests | number}}.</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- loader -->
+    <!-- <md-progress-linear ng-if="isLoading" class="md-warn" md-mode="indeterminate"></md-progress-linear> -->
+    <md-progress-circular ng-if="isLoading" style="margin: auto;" md-mode="indeterminate"></md-progress-circular>
+
+    <div ng-if="solutions" class="hw" ng-cloak>
+      <!-- <span ng-show="isLoading">Computing...</span> -->
+      <div ng-hide="isLoading">
+        <md-content class="nbg cp">
+          <md-list>
+            <md-list-item class="list-item" ng-repeat="solution in solutions track by $index" ng-click="updateBoard(solution)">
+              <p><span class="solution-label">Solution {{$index + 1 | fixlength:4}}</span> {{solution}}</p>
+              <ng-md-icon class="md-secondary" aria-label="SaveSolution" ng-click="myExerciseBoard($event, $index + 1, solution)" icon="mode_edit" style="fill: #D2D2D2" size="12"></ng-md-icon>
+            </md-list-item>
+          </md-list>
+        </md-content>
+      </div>
+    </div>
+
+    <div ng-hide="isLoading" sticky offset="10" disabled-sticky="false" class="hw list-item " anchor="top" ng-cloak>
+      <div id="solutionBoard" style="width: 100%"></div>
+    </div>
+
+  </div>
+
+  <!-- jquery js-->
+  <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.0.0-alpha1/jquery.js"></script>
+
+  <!-- chessboard js-->
+  <script type="text/javascript" src="js/chessboard-0.3.0.min.js"></script>
+
+  <!-- angular animate js -->
+  <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.6/angular-animate.min.js"></script>
+
+  <!-- angular aria js -->
+  <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.6/angular-aria.min.js"></script>
+
+  <!-- angular messages js -->
+  <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.6/angular-messages.min.js"></script>
+
+  <!-- angular material js -->
+  <script src="https://gitcdn.xyz/repo/angular/bower-material/v0.11.4/angular-material.js"></script>
+
+  <!-- angular material icons -->
+  <script src="//cdnjs.cloudflare.com/ajax/libs/angular-material-icons/0.6.0/angular-material-icons.min.js"></script>
+
+  <!-- sticky js -->
+  <script src="js/sticky.min.js"></script>
+
+  <!-- custom scripts -->
+  <script type="text/javascript" src="js/app.min.js"></script>
+  <script type="text/javascript" src="js/controllers.js"></script>
+  <script type="text/javascript" src="js/filters.min.js"></script>
+  <script type="text/javascript" src="js/services.min.js"></script>
+</body>
+
+</html>
